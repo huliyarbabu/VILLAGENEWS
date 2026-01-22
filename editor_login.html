@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-body">
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      
+      <div class="login-header">
+        <h1>ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</h1>
+        <p>Editor Login Panel</p>
+      </div>
+
+      <form method="post" class="login-form">
+        <label>📱 Phone Number</label>
+        <input type="text" name="phone" placeholder="Enter phone number" required>
+
+        <label>🔒 Password</label>
+        <input type="password" name="password" placeholder="Enter password" required>
+
+        <button type="submit" class="login-btn">✅ Login</button>
+      </form>
+
+      {% if error %}
+        <div class="login-error">{{ error }}</div>
+      {% endif %}
+
+      <div class="login-footer">
+        <a href="/" class="back-home">← Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

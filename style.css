@@ -1,0 +1,704 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+}
+
+.topbar {
+  background: #b30000;
+  color: white;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.logo p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.menu {
+  background: #ffcc00;
+  padding: 10px 20px;
+  display: flex;
+  gap: 15px;
+  font-weight: bold;
+  flex-wrap: wrap;
+}
+
+/* ✅ UPDATED ONLY THIS PART */
+.menu a {
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #111;
+  text-decoration: none;
+}
+
+.menu a:hover{
+  background:#eee;   /* standard hover */
+}
+
+.menu .active {
+  color: #fff;
+  background: #111;  /* standard selection (black/grey) */
+}
+/* ✅ END UPDATED PART */
+
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.hero {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.tag {
+  background: #ffcc00;
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.card h3 a {
+  text-decoration: none;
+  color: #111;
+}
+
+.date {
+  font-size: 12px;
+  color: gray;
+}
+
+.btn {
+  background: #ffcc00;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #111;
+  display: inline-block;
+}
+
+.footer {
+  background: #111;
+  color: white;
+  padding: 14px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* ✅ Thumbnail */
+.thumb{
+  width:100%;
+  height:170px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+/* ✅ Mobile */
+@media(max-width:600px){
+  .topbar{
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}
+.siteTitle{
+  font-size:24px;
+  font-weight:900;
+  color:#ffcc00;
+  text-shadow:2px 2px 8px rgba(0,0,0,0.4);
+}
+
+.topRight{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.searchBox{
+  padding:9px 12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  width:180px;
+}
+
+/* ✅ Hero news */
+.heroNews{
+  background:white;
+  border-radius:12px;
+  padding:14px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom:16px;
+}
+
+.heroThumb{
+  width:240px;
+  height:140px;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.heroTitle a{
+  text-decoration:none;
+  color:#111;
+  font-weight:900;
+}
+
+/* ✅ Main layout (news + trending) */
+.layout{
+  display:grid;
+  grid-template-columns: 1fr 280px;
+  gap:16px;
+}
+
+.secHead{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+/* ✅ Trending box */
+.trendBox{
+  background:white;
+  border-radius:12px;
+  padding:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  height:fit-content;
+}
+
+.trendItem{
+  display:flex;
+  gap:10px;
+  text-decoration:none;
+  color:#111;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+
+.trendNo{
+  background:#b30000;
+  color:white;
+  width:28px;
+  height:28px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+
+.trendTitle{
+  font-weight:900;
+  font-size:13px;
+  line-height:1.3;
+}
+
+.trendMeta{
+  font-size:12px;
+  color:gray;
+}
+
+/* ✅ Thumbnail */
+.thumb{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+/* ✅ Mobile responsive */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .heroNews{flex-direction:column;}
+  .heroThumb{width:100%; height:190px;}
+  .searchBox{width:150px;}
+}
+
+.breaking{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 18px;
+  background:#111;
+  color:white;
+  margin-bottom: 10px;
+}
+
+.breakingTag{
+  background:#ff3b30;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:900;
+  color:white;
+}
+
+/* ✅ Big nice login page */
+.login-body{
+  background: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-wrapper{
+  width: 100%;
+  max-width: 460px;
+  padding: 20px;
+}
+
+.login-card{
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  padding: 30px 26px;
+  border-top: 8px solid #b30000;
+}
+
+.login-header{
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-header h1{
+  margin: 0;
+  font-size: 26px;
+  font-weight: 900;
+  color: #b30000;
+}
+
+.login-header p{
+  margin-top: 6px;
+  font-size: 13px;
+  color: gray;
+  font-weight: bold;
+}
+
+.login-form label{
+  font-weight: 900;
+  margin-top: 12px;
+  display: block;
+  font-size: 13px;
+}
+
+.login-form input{
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 14px;
+}
+
+.login-form input:focus{
+  border: 1px solid #b30000;
+  box-shadow: 0 0 0 3px rgba(179,0,0,0.15);
+}
+
+.login-btn{
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  font-weight: 900;
+  font-size: 15px;
+  border: none;
+  border-radius: 12px;
+  background: #ffcc00;
+  color: #111;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-btn:hover{
+  transform: translateY(-1px);
+  background: #ffdb4d;
+}
+
+.login-error{
+  margin-top: 16px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffe5e5;
+  color: #b30000;
+  font-weight: 900;
+  text-align: center;
+}
+
+.login-footer{
+  text-align: center;
+  margin-top: 18px;
+}
+
+.back-home{
+  text-decoration: none;
+  color: #b30000;
+  font-weight: 900;
+}
+
+/* ✅ Follow Bar */
+.followBar{
+  max-width:1000px;
+  margin: 12px auto;
+  padding: 10px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.followText{
+  font-weight:900;
+  color:#111;
+}
+
+.socialBtn{
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:900;
+  border:none;
+  cursor:pointer;
+  display:inline-block;
+}
+
+.socialBtn.fb{ background:#1877f2; color:white; }
+.socialBtn.yt{ background:#ff0000; color:white; }
+.socialBtn.share{ background:#111; color:white; }
+
+/* ✅ Contact Bar */
+.contactBar{
+  max-width:1000px;
+  margin: 20px auto;
+  padding: 10px;
+  text-align:center;
+}
+
+.contactBtn{
+  background:#b30000;
+  color:white;
+  text-decoration:none;
+  padding:14px 18px;
+  border-radius:14px;
+  font-weight:900;
+  display:inline-block;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ✅ Share mini button */
+.newsMetaRow{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.shareMini{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  font-weight:900;
+  background:#111;
+  color:white;
+  cursor:pointer;
+}
+
+.logoArea{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.siteLogo{
+  width:55px;
+  height:55px;
+  border-radius:12px;
+  object-fit:cover;
+  border:2px solid #ffcc00;
+  background:white;
+}
+
+.logoText{
+  line-height:1.2;
+}
+
+/* ✅ Standard header alignment */
+.headerWrap{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+/* LEFT LOGO */
+.leftLogo{
+  width:90px;
+  display:flex;
+  justify-content:flex-start;
+}
+
+.siteLogoBig{
+  width: 200px;
+  height: 80px;
+  object-fit: contain;
+  background: white;
+  padding: 6px;
+  border-radius: 12px;
+  border: 3px solid #ffcc00;
+}
+
+/* CENTER TITLE */
+.centerTitle{
+  flex:1;
+  text-align:center;
+  line-height:1.2;
+}
+
+.siteTitleBig{
+  margin:0;
+  font-size:30px;
+  font-weight:900;
+  color:#ffcc00;
+  text-shadow:2px 2px 10px rgba(0,0,0,0.35);
+}
+
+.siteSub{
+  margin:4px 0 0 0;
+  font-size:12px;
+  opacity:0.95;
+}
+
+/* RIGHT ACTIONS */
+.rightActions{
+  width:260px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  align-items:center;
+}
+
+/* ✅ Mobile */
+@media(max-width:700px){
+  .headerWrap{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+  .leftLogo{width:auto;}
+  .rightActions{width:100%; justify-content:center;}
+  .siteTitleBig{font-size:22px;}
+  .siteLogoBig{width:70px;height:70px;}
+}
+
+.langBtn{
+  background:#111;
+  color:white;
+  padding:8px 12px;
+  border-radius:10px;
+  font-weight:900;
+  text-decoration:none;
+  display:inline-block;
+}
+.editorNearContact{
+  font-weight: 700;
+  font-size: 14px;
+  margin-left: 8px;
+}
+/* ✅ Editor badge near contact number */
+.contactBar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.editorBadge{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  color: #222;
+}
+
+.editorBadge b{
+  font-weight: 900;
+}
+.socialBtn{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.socialBtn .icon{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+.socialBtn .icon{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+.socialBtn .icon{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+/* ✅ Editor button - same size as contact button but colorful */
+.editorBtn{
+  background: linear-gradient(135deg, #ff9800, #ff3d00);
+  color: #fff !important;
+  border: none;
+}
+
+.editorBtn b{
+  font-weight: 900;
+}
+/* ✅ Editor button same size as contact button (RED only) */
+.editorBtn{
+  background: #e53935;   /* Red */
+  color: #fff !important;
+  border: none;
+}
+
+.editorBtn b{
+  font-weight: 900;
+}
+/* ✅ Separate bottom section after news */
+.bottomSection{
+  margin-top: 25px;
+  padding: 20px 15px;
+  background: #ffffff;
+  border-top: 2px solid #eee;
+}
+
+/* Keep contact+editor centered */
+.contactBar{
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+/* ✅ Editor Red Box (same size as contact) */
+.editorBtn{
+  background: #e53935;
+  color: #fff !important;
+  border: none;
+}
+
+/* ✅ Follow section spacing */
+.rightFollow{
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.followRow{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.bottomSection{
+  margin-top: 25px;
+  padding: 22px 15px;
+  background: #fff;
+  border-top: 2px solid #eee;
+}
+
+.contactBar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+/* same size as phone */
+.editorBtn{
+  background: #e53935;
+  color: #fff !important;
+  border: none;
+}
+
+.followRow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center; /* neat center */
+}
+
+.socialBtn{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.socialBtn .icon{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+/* ✅ Follow Us buttons centered neatly */
+.rightFollow{
+  text-align: center;
+}
+
+.followRow{
+  display: flex;
+  justify-content: center;   /* ✅ center in middle */
+  align-items: center;       /* ✅ same line alignment */
+  gap: 12px;
+  flex-wrap: wrap;           /* ✅ works well in mobile */
+  margin-top: 10px;
+}

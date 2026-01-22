@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="headerWrap">
+
+    <div class="leftLogo">
+      <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
+    </div>
+
+    <div class="centerTitle">
+      <h1 class="siteTitleBig">ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</h1>
+      <p class="siteSub">ಸುದ್ದಿ ವಿವರ</p>
+    </div>
+
+    <div class="rightActions">
+      <!-- ✅ Back Button -->
+      <button class="btn" type="button" onclick="history.back()">⬅ ಹಿಂದಕ್ಕೆ</button>
+
+      <!-- Home -->
+      <a href="/" class="btn">ಮುಖಪುಟ</a>
+    </div>
+
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+
+    <!-- ✅ Removed thumbnail to avoid duplicate image -->
+
+    <span class="tag">{{ item["category"] }}</span>
+    <h2 style="margin-top:10px;">{{ item["title"] }}</h2>
+
+    <div class="newsMetaRow">
+      <p class="date">🕒 {{ item["created_at"] }} • 👁 {{ item["views"] }}</p>
+      <button class="shareMini" onclick="shareNews()">🔗 Share</button>
+    </div>
+
+    <hr style="margin:12px 0; opacity:0.2;">
+
+    <div class="newsContent">
+      {{ item["content"] | safe }}
+    </div>
+
+  </div>
+</div>
+
+<div class="contactBar">
+  <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
+</div>
+
+<footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
+
+<script>
+  function shareNews(){
+    const url = window.location.href;
+    const title = "{{ item['title']|e }}";
+    const data = { title: title, text: title, url: url };
+
+    if(navigator.share){
+      navigator.share(data);
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("✅ Link copied!");
+    }
+  }
+</script>
+
+</body>
+</html>
