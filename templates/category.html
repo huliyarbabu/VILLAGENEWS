@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ catname }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="headerWrap">
+
+    <div class="leftLogo">
+      <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
+    </div>
+
+    <div class="centerTitle">
+      <h1 class="siteTitleBig">ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</h1>
+      <p class="siteSub">{{ catname }} ವಿಭಾಗ</p>
+    </div>
+
+    <div class="rightActions">
+      <!-- ✅ Back Button -->
+      <button class="btn" type="button" onclick="history.back()">⬅ ಹಿಂದಕ್ಕೆ</button>
+
+      <!-- ✅ Home Button -->
+      <a href="/" class="btn">ಮುಖಪುಟ</a>
+    </div>
+
+  </div>
+</header>
+
+<nav class="menu">
+  <a href="/">ಮುಖಪುಟ</a>
+  <a class="active">{{ catname }}</a>
+</nav>
+
+{% if breaking_list|length > 0 %}
+<div class="breaking">
+  <span class="breakingTag">BREAKING</span>
+  <marquee behavior="scroll" direction="left">
+    {% for b in breaking_list %} {{ b["title"] }} • {% endfor %}
+  </marquee>
+</div>
+{% endif %}
+
+<div class="container">
+  <section class="layout">
+
+    <!-- ✅ Category News -->
+    <div>
+      <h2 class="secHead">{{ catname }} ಸುದ್ದಿ</h2>
+
+      <section class="grid">
+        {% for n in news_list %}
+          <div class="card">
+            {% if n["thumb"] %}
+              <img src="{{ n['thumb'] }}" class="thumb">
+            {% endif %}
+            <span class="tag">{{ n["category"] }}</span>
+            <h3><a href="/news/{{n['id']}}">{{ n["title"] }}</a></h3>
+            <p class="date">🕒 {{ n["created_at"] }} • 👁 {{ n["views"] }}</p>
+          </div>
+        {% else %}
+          <p>ಯಾವುದೇ ಸುದ್ದಿ ಇಲ್ಲ</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <!-- ✅ Trending -->
+    <aside class="trendBox">
+      <h2 class="secHead">ಟ್ರೆಂಡಿಂಗ್ ಸುದ್ದಿ</h2>
+
+      {% for n in trending %}
+        <a class="trendItem" href="/news/{{n['id']}}">
+          <span class="trendNo">{{ loop.index }}</span>
+          <div>
+            <div class="trendTitle">{{ n["title"] }}</div>
+            <div class="trendMeta">{{ n["category"] }} • 👁 {{ n["views"] }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </aside>
+
+  </section>
+</div>
+
+<footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
+
+</body>
+</html>

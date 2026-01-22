@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <h1>Editor Dashboard</h1>
+  </div>
+  <div>
+    <a href="/editor/new" class="btn">➕ Add News</a>
+    <a href="/editor/logout" class="btn">Logout</a>
+  </div>
+</header>
+
+<div class="container">
+  {% for n in news_list %}
+    <div class="card">
+      <span class="tag">{{n["category"]}}</span>
+      <h3>{{n["title"]}}</h3>
+      <p class="date">{{n["created_at"]}}</p>
+      <a href="/news/{{n['id']}}" class="btn">View</a>
+      <a href="/editor/delete/{{n['id']}}" class="btn danger" onclick="return confirm('Delete?')">Delete</a>
+    <a href="/editor/edit/{{ n['id'] }}" class="btn">Edit</a>
+
+    </div>
+  {% endfor %}
+</div>
+
+</body>
+</html>

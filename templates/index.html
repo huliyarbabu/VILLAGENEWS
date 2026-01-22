@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
+</head>
+<body>
+
+<h1>ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</h1>
+<a href="/editor/login">Editor Login</a>
+<hr>
+
+{% for n in news_list %}
+  <h3><a href="/news/{{ n['id'] }}">{{ n["title"] }}</a></h3>
+  <p>{{ n["category"] }} | {{ n["created_at"] }}</p>
+  <hr>
+{% else %}
+  <p>ಯಾವುದೇ ಸುದ್ದಿ ಇಲ್ಲ</p>
+{% endfor %}
+
+</body>
+</html>

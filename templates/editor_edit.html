@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit News</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <h1>Edit News</h1>
+  </div>
+  <a href="/editor/dashboard" class="btn">Dashboard</a>
+</header>
+
+<div class="container">
+  <div class="news-box">
+    <h2>ಸುದ್ದಿ ಸಂಪಾದನೆ</h2>
+
+    <form method="post">
+      <label>ಶೀರ್ಷಿಕೆ</label>
+      <input type="text" name="title" required value="{{ item['title'] }}">
+
+      <label>ವಿಭಾಗ</label>
+      <select name="category">
+        <option {% if item['category']=='ಸ್ಥಳೀಯ' %}selected{% endif %}>ಸ್ಥಳೀಯ</option>
+        <option {% if item['category']=='ರಾಜಕೀಯ' %}selected{% endif %}>ರಾಜಕೀಯ</option>
+        <option {% if item['category']=='ರೈತ ಸುದ್ದಿ' %}selected{% endif %}>ರೈತ ಸುದ್ದಿ</option>
+        <option {% if item['category']=='ಶಿಕ್ಷಣ' %}selected{% endif %}>ಶಿಕ್ಷಣ</option>
+        <option {% if item['category']=='ಕ್ರೀಡೆ' %}selected{% endif %}>ಕ್ರೀಡೆ</option>
+      </select>
+
+      <label style="font-weight:bold;margin:12px 0;display:block;">
+        <input type="checkbox" name="breaking" value="1" {% if item['breaking']==1 %}checked{% endif %}>
+        ✅ Breaking News ಆಗಿ ಗುರುತಿಸಿ
+      </label>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0;">
+        <button type="button" class="btn" onclick="uploadImage()">🖼 Upload Image</button>
+        <button type="button" class="btn danger" onclick="uploadVideo()">🎥 Upload Video</button>
+      </div>
+
+      <label>ಸುದ್ದಿ ವಿವರ</label>
+      <textarea id="content" name="content">{{ item['content'] }}</textarea>
+
+      <button class="btn" type="submit" style="margin-top:12px;">✅ Update</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+  CKEDITOR.replace('content', { height: 420 });
+
+  // ✅ Upload to server (shows exact errors like 401, 413, 500)
+  async function uploadToServer(file) {
+    let data = new FormData();
+    data.append("upload", file);
+
+    let res;
+    try {
+      res = await fetch("/upload-media", { method: "POST", body: data });
+    } catch (err) {
+      alert("❌ Network error: " + err);
+      return { uploaded: 0, error: { message: String(err) } };
+    }
+
+    // ✅ show exact server error
+    if (!res.ok) {
+      const text = await res.text();
+      alert("❌ Upload failed (" + res.status + "): " + text);
+      return { uploaded: 0, error: { message: text } };
+    }
+
+    const json = await res.json();
+    console.log("UPLOAD RESPONSE:", json);
+    return json;
+  }
+
+  // ✅ Upload Image
+  async function uploadImage() {
+    let input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = async function() {
+      let file = input.files[0];
+      if (!file) return;
+
+      let json = await uploadToServer(file);
+
+      if (json.uploaded) {
+        CKEDITOR.instances.content.insertHtml(`
+          <img src="${json.url}" style="width:100%;border-radius:12px;margin:10px 0;">
+        `);
+      } else {
+        alert("❌ Image upload failed: " + (json.error?.message || ""));
+      }
+    };
+
+    input.click();
+  }
+
+  // ✅ Upload Video
+  async function uploadVideo() {
+    let input = document.createElement("input");
+    input.type = "file";
+
+    // ✅ accept more formats (mobile videos often MOV/3GP)
+    input.accept = "video/mp4,video/webm,video/ogg,video/quicktime,video/3gpp";
+
+    input.onchange = async function() {
+      let file = input.files[0];
+      if (!file) return;
+
+      let json = await uploadToServer(file);
+
+      if (json.uploaded) {
+        CKEDITOR.instances.content.insertHtml(`
+          <div style="margin:10px 0;">
+            <video controls playsinline style="width:100%;border-radius:12px;">
+              <source src="${json.url}" type="${file.type || 'video/mp4'}">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        `);
+      } else {
+        alert("❌ Video upload failed: " + (json.error?.message || ""));
+      }
+    };
+
+    input.click();
+  }
+</script>
+
+</body>
+</html>

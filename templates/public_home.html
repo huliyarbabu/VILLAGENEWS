@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="headerWrap">
+
+    <div class="leftLogo">
+      <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
+    </div>
+
+    <div class="centerTitle">
+      <h1 class="siteTitleBig">ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</h1>
+      <p class="siteSub">ಗ್ರಾಮೀಣ ಸುದ್ದಿ • ಸ್ಥಳೀಯ ಅಪ್ಡೇಟ್</p>
+    </div>
+
+    <div class="rightActions">
+      <input type="text" id="searchInput" placeholder="ಸುದ್ದಿ ಹುಡುಕಿ..." class="searchBox">
+      <a href="/editor/login" class="btn">Editor</a>
+    </div>
+
+  </div>
+</header>
+
+<nav class="menu">
+  <a class="active" href="/">ಮುಖಪುಟ</a>
+  <a href="/category/ಸ್ಥಳೀಯ">ಸ್ಥಳೀಯ</a>
+  <a href="/category/ರಾಜಕೀಯ">ರಾಜಕೀಯ</a>
+  <a href="/category/ರೈತ ಸುದ್ದಿ">ರೈತ ಸುದ್ದಿ</a>
+  <a href="/category/ಶಿಕ್ಷಣ">ಶಿಕ್ಷಣ</a>
+  <a href="/category/ಕ್ರೀಡೆ">ಕ್ರೀಡೆ</a>
+</nav>
+
+{% if breaking_list|length > 0 %}
+<div class="breaking">
+  <span class="breakingTag">BREAKING</span>
+  <marquee behavior="scroll" direction="left">
+    {% for b in breaking_list %} {{ b["title"] }} • {% endfor %}
+  </marquee>
+</div>
+{% endif %}
+
+<div class="container">
+  <section class="layout">
+
+    <!-- ✅ Latest News -->
+    <div>
+      <h2 class="secHead">ಇತ್ತೀಚಿನ ಸುದ್ದಿ</h2>
+
+      <section class="grid" id="newsGrid">
+        {% for n in news_list %}
+          <div class="card" data-title="{{ n['title'] }}">
+            {% if n["thumb"] %}
+              <img src="{{ n['thumb'] }}" class="thumb">
+            {% endif %}
+
+            <span class="tag">{{ n["category"] }}</span>
+
+            <h3>
+              <a href="/news/{{n['id']}}">{{ n["title"] }}</a>
+            </h3>
+
+            <div class="newsMetaRow">
+              <p class="date">🕒 {{ n["created_at"] }} • 👁 {{ n["views"] }}</p>
+              <button class="shareMini"
+                onclick="shareLink('/news/{{n['id']}}','{{ n['title']|e }}')">
+                Share
+              </button>
+            </div>
+          </div>
+        {% else %}
+          <p>ಯಾವುದೇ ಸುದ್ದಿ ಇಲ್ಲ</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <!-- ✅ Right Panel -->
+    <aside class="trendBox">
+
+      <!-- ✅ Trending -->
+      <h2 class="secHead">ಟ್ರೆಂಡಿಂಗ್ ಸುದ್ದಿ</h2>
+
+      <div id="trendList">
+        {% for n in trending %}
+          <a class="trendItem" href="/news/{{n['id']}}" data-title="{{ n['title'] }}">
+            <span class="trendNo">{{ loop.index }}</span>
+            <div>
+              <div class="trendTitle">{{ n["title"] }}</div>
+              <div class="trendMeta">{{ n["category"] }} • 👁 {{ n["views"] }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+
+    </aside>
+
+  </section>
+</div>
+
+<!-- ✅ Bottom Section (separate from news) -->
+<section class="bottomSection">
+
+  <!-- ✅ Contact + Editor -->
+  <div class="contactBar">
+    <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
+
+    <span class="contactBtn editorBtn">
+      ✍ Editor: <b>Narendra Babu Huliyar</b>
+    </span>
+  </div>
+
+  <!-- ✅ Follow Us -->
+  <div class="rightFollow">
+    <h3 class="rightTitle">Follow Us</h3>
+
+    <div class="followRow">
+
+      <!-- Facebook -->
+      <a class="socialBtn fb"
+         href="https://www.facebook.com/share/g/189BVq5vVs/"
+         target="_blank">
+
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M22 12a10 10 0 1 0-11.56 9.87v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.89 3.79-3.89
+          1.1 0 2.25.2 2.25.2v2.46h-1.27c-1.25 0-1.64.78-1.64 1.57V12h2.79l-.45 2.88h-2.34v6.99A10 10 0 0 0 22 12z"/>
+        </svg>
+
+        Facebook
+      </a>
+
+      <!-- YouTube -->
+      <a class="socialBtn yt"
+         href="https://youtube.com/@huliyarbabu?si=v4svNXVXiIMZP1zu"
+         target="_blank">
+
+        <svg class="icon" viewBox="0 0 576 512" aria-hidden="true">
+          <path d="M549.655 124.083c-6.281-23.65-24.787-42.209-48.284-48.51C458.781 64 288 64 288 64S117.219 64 74.629 75.573c-23.497 6.301-42.003 24.86-48.284 48.51C14.815 167.966 14.815 256 14.815 256s0 88.034 11.53 131.917c6.281 23.65 24.787 41.5 48.284 47.801C117.219 448 288 448 288 448s170.781 0 213.371-11.582c23.497-6.301 42.003-24.151 48.284-47.801C561.185 344.034 561.185 256 561.185 256s0-88.034-11.53-131.917zM232.145 336V176l142.739 80-142.739 80z"/>
+        </svg>
+
+        YouTube
+      </a>
+
+      <!-- Share -->
+      <button class="socialBtn share" onclick="shareSite()">🔗 Share</button>
+
+    </div>
+  </div>
+
+</section>
+
+<footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
+
+<script>
+  // ✅ Search
+  const cards = document.querySelectorAll(".card");
+  const trendItems = document.querySelectorAll(".trendItem");
+  const searchInput = document.getElementById("searchInput");
+
+  function searchFilter() {
+    const q = (searchInput.value || "").trim().toLowerCase();
+
+    cards.forEach(card => {
+      const title = (card.dataset.title || "").trim().toLowerCase();
+      card.style.display = title.includes(q) ? "block" : "none";
+    });
+
+    trendItems.forEach(item => {
+      const title = (item.dataset.title || "").trim().toLowerCase();
+      item.style.display = title.includes(q) ? "flex" : "none";
+    });
+  }
+  searchInput.addEventListener("input", searchFilter);
+
+  // ✅ Share
+  function shareSite(){ shareAny(window.location.href, "ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ"); }
+  function shareLink(path, title){ shareAny(window.location.origin + path, title); }
+
+  function shareAny(url, title){
+    const data = { title: title, text: title, url: url };
+    if(navigator.share){ navigator.share(data); }
+    else { navigator.clipboard.writeText(url); alert("✅ Link copied!"); }
+  }
+</script>
+
+</body>
+</html>
