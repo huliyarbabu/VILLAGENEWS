@@ -19,11 +19,15 @@ EDITOR_PASSWORD = "12345"
 # ✅ Allowed types
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "mp4", "webm", "ogg", "mov", "3gp", "mkv"}
 
-# ✅ Cloudinary config (from Render Environment Variables)
+# ✅ FIXED Cloudinary config (reads from Render Environment Variables correctly)
+cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME")
+api_key = os.environ.get("CLOUDINARY_API_KEY")
+api_secret = os.environ.get("CLOUDINARY_API_SECRET")
+
 cloudinary.config(
-    cloud_name=os.environ.get("dvi3nqttx"),
-    api_key=os.environ.get("613868972687331"),
-    api_secret=os.environ.get("N5IB2"),
+    cloud_name=cloud_name,
+    api_key=api_key,
+    api_secret=api_secret,
     secure=True
 )
 
@@ -180,7 +184,7 @@ def editor_new():
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
-            thumb = m.group(1)  # Cloudinary URL will be stored here automatically
+            thumb = m.group(1)
 
         conn = db()
         conn.execute(
@@ -217,7 +221,7 @@ def editor_edit(news_id):
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
-            thumb = m.group(1)  # Cloudinary URL
+            thumb = m.group(1)
 
         conn.execute("""
             UPDATE news SET title=?, category=?, content=?, thumb=?, breaking=?
@@ -287,4 +291,3 @@ def upload_media():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
-
