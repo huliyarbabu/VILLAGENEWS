@@ -7,10 +7,12 @@
   <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  {# ✅ OG thumbnail URL (use news thumb else logo) #}
+  {# ✅ Use thumbnail #}
   {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png', _external=True) %}
+
+  {# ✅ Create WhatsApp OG image (crop only for preview) #}
   {% if thumb_url.startswith("http") %}
-    {% set og_img = thumb_url %}
+    {% set og_img = thumb_url.replace("/upload/", "/upload/c_fill,w_1200,h_630,g_auto,q_auto,f_auto/") %}
   {% else %}
     {% set og_img = url_for('static', filename='logo.png', _external=True) %}
   {% endif %}
@@ -74,6 +76,7 @@
 
     <hr style="margin:12px 0; opacity:0.2;">
 
+    <!-- ✅ FULL CONTENT IMAGE WILL SHOW (no crop) -->
     <div class="newsContent">
       {{ item["content"] | safe }}
     </div>
@@ -100,7 +103,6 @@
   // ✅ Share to ALL apps
   function shareAll(){
     const data = { title: pageTitle, text: pageTitle, url: pageUrl };
-
     if(navigator.share){
       navigator.share(data);
     } else {
@@ -108,14 +110,14 @@
     }
   }
 
-  // ✅ WhatsApp share (forces preview image)
+  // ✅ WhatsApp share (forces preview refresh)
   function shareWhatsApp(){
     const finalUrl = pageUrl + (pageUrl.includes("?") ? "&" : "?") + "v=" + Date.now();
     const wa = "https://wa.me/?text=" + encodeURIComponent(pageTitle + "\n" + finalUrl);
     window.open(wa, "_blank");
   }
 
-  // ✅ Copy Link always works
+  // ✅ Copy link
   function copyLink(){
     navigator.clipboard.writeText(pageUrl);
     alert("✅ Link copied!");
