@@ -7,27 +7,33 @@
   <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  {# ✅ OG thumbnail URL (use news thumb if exists else fallback logo) #}
-  {% set og_img = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png', _external=True) %}
+  {# ✅ Create absolute thumbnail URL for WhatsApp preview #}
+  {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png') %}
 
-  <!-- ✅ OpenGraph tags (WhatsApp / Facebook Preview) -->
+  {% if thumb_url.startswith("http") %}
+    {% set og_img = thumb_url %}
+  {% else %}
+    {% set og_img = url_for('static', filename='logo.png', _external=True) %}
+  {% endif %}
+
+  {# ✅ OpenGraph / WhatsApp preview #}
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
   <meta property="og:title" content="{{ item['title'] }}">
-  <meta property="og:description" content="ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ - ಸ್ಥಳೀಯ ಸುದ್ದಿ ಅಪ್ಡೇಟ್">
+  <meta property="og:description" content="{{ item['category'] }} ಸುದ್ದಿ | ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
   <meta property="og:url" content="{{ request.url }}">
   <meta property="og:image" content="{{ og_img }}">
   <meta property="og:image:secure_url" content="{{ og_img }}">
 
-  <!-- ✅ Extra OG settings (helps WhatsApp show big image) -->
+  {# ✅ MUST for WhatsApp good preview #}
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
-  <!-- ✅ Twitter preview -->
+  {# ✅ Twitter preview (optional but helps) #}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ item['title'] }}">
-  <meta name="twitter:description" content="ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ - ಸ್ಥಳೀಯ ಸುದ್ದಿ ಅಪ್ಡೇಟ್">
+  <meta name="twitter:description" content="{{ item['category'] }} ಸುದ್ದಿ | ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
   <meta name="twitter:image" content="{{ og_img }}">
 </head>
 
@@ -35,7 +41,6 @@
 
 <header class="topbar">
   <div class="headerWrap">
-
     <div class="leftLogo">
       <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
     </div>
@@ -49,7 +54,6 @@
       <button class="btn" type="button" onclick="history.back()">⬅ ಹಿಂದಕ್ಕೆ</button>
       <a href="/" class="btn">ಮುಖಪುಟ</a>
     </div>
-
   </div>
 </header>
 
@@ -57,7 +61,6 @@
   <div class="card">
 
     <span class="tag">{{ item["category"] }}</span>
-
     <h2 style="margin-top:10px;">{{ item["title"] }}</h2>
 
     <div class="newsMetaRow">
@@ -91,9 +94,6 @@
   function shareNews(){
     const url = window.location.href;
     const title = "{{ item['title']|e }}";
-
-    // ✅ Sharing: WhatsApp preview depends on OG tags (meta tags),
-    // not on navigator.share image.
     const data = { title: title, text: title, url: url };
 
     if(navigator.share){
