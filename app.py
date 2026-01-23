@@ -1,9 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, abort, jsonify, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, session, abort, jsonify, url_for
 import sqlite3
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
 import re
+
+# ✅ Cloudinary
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__)
 app.secret_key = "huliyar-secret-key-change-this"
@@ -12,17 +16,24 @@ app.secret_key = "huliyar-secret-key-change-this"
 EDITOR_PHONE = "9036860070"
 EDITOR_PASSWORD = "12345"
 
-UPLOAD_FOLDER = "static/uploads"
+# ✅ Allowed types
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "mp4", "webm", "ogg", "mov", "3gp", "mkv"}
 
-# ✅ allow images + videos
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "mp4", "webm", "ogg"}
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024  # 200MB
+# ✅ Cloudinary config (from Render Environment Variables)
+cloudinary.config(
+    cloud_name=os.environ.get("dvi3nqttx"),
+    api_key=os.environ.get("613868972687331"),
+    api_secret=os.environ.get("N5IB2"),
+    secure=True
+)
 
 
 def db():
-    conn = sqlite3.connect("news.db")
+    # ✅ Always correct db path (Render fix)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(base_dir, "news.db")
+
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -51,12 +62,6 @@ def editor_required():
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-# ✅ Route to serve uploaded files (important for video playback)
-@app.route("/static/uploads/<path:filename>")
-def uploaded_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 # ---------------- PUBLIC ----------------
@@ -175,7 +180,7 @@ def editor_new():
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
-            thumb = m.group(1)
+            thumb = m.group(1)  # Cloudinary URL will be stored here automatically
 
         conn = db()
         conn.execute(
@@ -212,7 +217,7 @@ def editor_edit(news_id):
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
-            thumb = m.group(1)
+            thumb = m.group(1)  # Cloudinary URL
 
         conn.execute("""
             UPDATE news SET title=?, category=?, content=?, thumb=?, breaking=?
@@ -240,7 +245,7 @@ def editor_delete(news_id):
     return redirect("/editor/dashboard")
 
 
-# ✅ CKEditor upload handler (images + video)
+# ✅ CKEditor upload handler (Cloudinary images + videos)
 @app.route("/upload-media", methods=["POST"])
 def upload_media():
     if not editor_required():
@@ -253,28 +258,33 @@ def upload_media():
     if file.filename == "":
         return jsonify({"uploaded": 0, "error": {"message": "Empty filename"}}), 400
 
-    # ✅ auto create folder if missing
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-
     if not allowed_file(file.filename):
         return jsonify({"uploaded": 0, "error": {"message": "Invalid file type"}}), 400
 
     try:
         filename = secure_filename(file.filename)
-        unique_name = f"{int(datetime.now().timestamp())}_{filename}"
-        save_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_name)
-        file.save(save_path)
+        ext = filename.rsplit(".", 1)[-1].lower()
 
-        url = url_for("static", filename=f"uploads/{unique_name}")
+        is_video = ext in {"mp4", "webm", "ogg", "mov", "3gp", "mkv"}
 
-        return jsonify({"uploaded": 1, "fileName": unique_name, "url": url})
+        # ✅ Upload to Cloudinary
+        result = cloudinary.uploader.upload(
+            file,
+            resource_type="video" if is_video else "image",
+            folder="huliyar_news"
+        )
+
+        url = result.get("secure_url")
+        if not url:
+            return jsonify({"uploaded": 0, "error": {"message": "Cloudinary upload failed"}}), 500
+
+        return jsonify({"uploaded": 1, "fileName": filename, "url": url})
 
     except Exception as e:
         return jsonify({"uploaded": 0, "error": {"message": str(e)}}), 500
 
 
-
 if __name__ == "__main__":
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     init_db()
     app.run(debug=True)
+
