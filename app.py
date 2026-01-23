@@ -16,8 +16,11 @@ app.secret_key = "huliyar-secret-key-change-this"
 EDITOR_PHONE = "9036860070"
 EDITOR_PASSWORD = "12345"
 
-# ✅ Allowed types
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "mp4", "webm", "ogg", "mov", "3gp", "mkv"}
+# ✅ Allowed types (Images + Videos)
+ALLOWED_EXTENSIONS = {
+    "png", "jpg", "jpeg", "webp", "gif",
+    "mp4", "webm", "ogg", "mov", "3gp", "mkv"
+}
 
 # ✅ Cloudinary config (Render ENV)
 cloud_name = (os.environ.get("CLOUDINARY_CLOUD_NAME") or "").strip()
@@ -38,7 +41,7 @@ print("✅ Cloudinary loaded:",
 
 
 def db():
-    # ✅ Always correct db path
+    # ✅ Render safe db path
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, "news.db")
 
@@ -81,8 +84,14 @@ def public_home():
 
     conn = db()
     news_list = conn.execute("SELECT * FROM news ORDER BY id DESC").fetchall()
-    trending = conn.execute("SELECT * FROM news ORDER BY views DESC LIMIT 10").fetchall()
-    breaking_list = conn.execute("SELECT * FROM news WHERE breaking=1 ORDER BY id DESC LIMIT 10").fetchall()
+
+    # ✅ Trending = Latest first (as you requested)
+    trending = conn.execute("SELECT * FROM news ORDER BY id DESC LIMIT 10").fetchall()
+
+    breaking_list = conn.execute(
+        "SELECT * FROM news WHERE breaking=1 ORDER BY id DESC LIMIT 10"
+    ).fetchall()
+
     conn.close()
 
     return render_template(
@@ -121,8 +130,13 @@ def category_page(catname):
         (catname,)
     ).fetchall()
 
-    trending = conn.execute("SELECT * FROM news ORDER BY views DESC LIMIT 10").fetchall()
-    breaking_list = conn.execute("SELECT * FROM news WHERE breaking=1 ORDER BY id DESC LIMIT 10").fetchall()
+    # ✅ Trending = Latest first
+    trending = conn.execute("SELECT * FROM news ORDER BY id DESC LIMIT 10").fetchall()
+
+    breaking_list = conn.execute(
+        "SELECT * FROM news WHERE breaking=1 ORDER BY id DESC LIMIT 10"
+    ).fetchall()
+
     conn.close()
 
     return render_template(
@@ -166,6 +180,7 @@ def editor_dashboard():
     conn = db()
     news_list = conn.execute("SELECT * FROM news ORDER BY id DESC").fetchall()
     conn.close()
+
     return render_template("editor_dashboard.html", news_list=news_list)
 
 
@@ -185,7 +200,7 @@ def editor_new():
 
         created_at = datetime.now().strftime("%d-%m-%Y %I:%M %p")
 
-        # ✅ auto thumbnail from first image in content
+        # ✅ thumbnail from first image in content
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
@@ -222,6 +237,7 @@ def editor_edit(news_id):
         content = request.form.get("content", "").strip()
         breaking = 1 if request.form.get("breaking") == "1" else 0
 
+        # ✅ thumbnail from first image in content
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
@@ -250,15 +266,17 @@ def editor_delete(news_id):
     conn.execute("DELETE FROM news WHERE id=?", (news_id,))
     conn.commit()
     conn.close()
+
     return redirect("/editor/dashboard")
 
 
-# ✅ CKEditor upload handler (Cloudinary images + videos + WhatsApp thumbnail fix)
+# ✅ CKEditor upload handler (Cloudinary images + videos)
 @app.route("/upload-media", methods=["POST"])
 def upload_media():
     if not editor_required():
         return jsonify({"uploaded": 0, "error": {"message": "Session expired. Please login again."}}), 401
 
+    # ✅ Cloudinary env check
     if not cloud_name or not api_key or not api_secret:
         return jsonify({"uploaded": 0, "error": {"message": "Cloudinary ENV missing in Render Environment"}}), 500
 
@@ -275,28 +293,17 @@ def upload_media():
     try:
         filename = secure_filename(file.filename)
 
-        # ✅ Upload to Cloudinary (AUTO supports image+video)
+        # ✅ Upload to Cloudinary (auto image/video)
         result = cloudinary.uploader.upload(
             file,
             resource_type="auto",
             folder="huliyar_news"
         )
 
+        # ✅ IMPORTANT: Return original full url (NO crop)
         url = result.get("secure_url")
         if not url:
             return jsonify({"uploaded": 0, "error": {"message": "Cloudinary upload failed (no secure_url)"}}), 500
-
-        # ✅ WhatsApp Blog Preview thumbnail size (only for image)
-        if result.get("resource_type") == "image":
-            public_id = result.get("public_id")
-            url = cloudinary.CloudinaryImage(public_id).build_url(
-                secure=True,
-                transformation=[
-                    {"width": 1200, "height": 630, "crop": "fill", "gravity": "auto"},
-                    {"quality": "auto"},
-                    {"fetch_format": "auto"}
-                ]
-            )
 
         return jsonify({"uploaded": 1, "fileName": filename, "url": url})
 
