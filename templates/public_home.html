@@ -56,8 +56,13 @@
       <section class="grid" id="newsGrid">
         {% for n in news_list %}
           <div class="card" data-title="{{ n['title'] }}">
+
+            <!-- ✅ Thumbnail FIX -->
             {% if n["thumb"] %}
-              <img src="{{ n['thumb'] }}" class="thumb">
+              <img src="{{ n['thumb'] }}" class="thumb"
+                   onerror="this.onerror=null;this.src='{{ url_for('static', filename='logo.png') }}';">
+            {% else %}
+              <img src="{{ url_for('static', filename='logo.png') }}" class="thumb">
             {% endif %}
 
             <span class="tag">{{ n["category"] }}</span>
@@ -68,9 +73,11 @@
 
             <div class="newsMetaRow">
               <p class="date">🕒 {{ n["created_at"] }} • 👁 {{ n["views"] }}</p>
+
+              <!-- ✅ WhatsApp Share (mobile fix) -->
               <button class="shareMini"
-                onclick="shareLink('/news/{{n['id']}}','{{ n['title']|e }}')">
-                Share
+                onclick="shareWhatsApp('{{ request.host_url[:-1] }}/news/{{n['id']}}', '{{ n['title']|e }}')">
+                📲 WhatsApp
               </button>
             </div>
           </div>
@@ -82,8 +89,6 @@
 
     <!-- ✅ Right Panel -->
     <aside class="trendBox">
-
-      <!-- ✅ Trending -->
       <h2 class="secHead">ಟ್ರೆಂಡಿಂಗ್ ಸುದ್ದಿ</h2>
 
       <div id="trendList">
@@ -97,16 +102,14 @@
           </a>
         {% endfor %}
       </div>
-
     </aside>
 
   </section>
 </div>
 
-<!-- ✅ Bottom Section (separate from news) -->
+<!-- ✅ Bottom Section -->
 <section class="bottomSection">
 
-  <!-- ✅ Contact + Editor -->
   <div class="contactBar">
     <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
 
@@ -115,40 +118,19 @@
     </span>
   </div>
 
-  <!-- ✅ Follow Us -->
   <div class="rightFollow">
     <h3 class="rightTitle">Follow Us</h3>
 
     <div class="followRow">
-
-      <!-- Facebook -->
-      <a class="socialBtn fb"
-         href="https://www.facebook.com/share/g/189BVq5vVs/"
-         target="_blank">
-
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M22 12a10 10 0 1 0-11.56 9.87v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.89 3.79-3.89
-          1.1 0 2.25.2 2.25.2v2.46h-1.27c-1.25 0-1.64.78-1.64 1.57V12h2.79l-.45 2.88h-2.34v6.99A10 10 0 0 0 22 12z"/>
-        </svg>
-
+      <a class="socialBtn fb" href="https://www.facebook.com/share/g/189BVq5vVs/" target="_blank">
         Facebook
       </a>
 
-      <!-- YouTube -->
-      <a class="socialBtn yt"
-         href="https://youtube.com/@huliyarbabu?si=v4svNXVXiIMZP1zu"
-         target="_blank">
-
-        <svg class="icon" viewBox="0 0 576 512" aria-hidden="true">
-          <path d="M549.655 124.083c-6.281-23.65-24.787-42.209-48.284-48.51C458.781 64 288 64 288 64S117.219 64 74.629 75.573c-23.497 6.301-42.003 24.86-48.284 48.51C14.815 167.966 14.815 256 14.815 256s0 88.034 11.53 131.917c6.281 23.65 24.787 41.5 48.284 47.801C117.219 448 288 448 288 448s170.781 0 213.371-11.582c23.497-6.301 42.003-24.151 48.284-47.801C561.185 344.034 561.185 256 561.185 256s0-88.034-11.53-131.917zM232.145 336V176l142.739 80-142.739 80z"/>
-        </svg>
-
+      <a class="socialBtn yt" href="https://youtube.com/@huliyarbabu?si=v4svNXVXiIMZP1zu" target="_blank">
         YouTube
       </a>
 
-      <!-- Share -->
       <button class="socialBtn share" onclick="shareSite()">🔗 Share</button>
-
     </div>
   </div>
 
@@ -177,14 +159,19 @@
   }
   searchInput.addEventListener("input", searchFilter);
 
-  // ✅ Share
-  function shareSite(){ shareAny(window.location.href, "ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ"); }
-  function shareLink(path, title){ shareAny(window.location.origin + path, title); }
+  // ✅ WhatsApp Share (forces preview)
+  function shareWhatsApp(url, title){
+    const finalUrl = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + finalUrl);
+    window.open(wa, "_blank");
+  }
 
-  function shareAny(url, title){
-    const data = { title: title, text: title, url: url };
-    if(navigator.share){ navigator.share(data); }
-    else { navigator.clipboard.writeText(url); alert("✅ Link copied!"); }
+  // ✅ Site Share
+  function shareSite(){
+    const url = window.location.href;
+    const title = "ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ";
+    const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + url);
+    window.open(wa, "_blank");
   }
 </script>
 
