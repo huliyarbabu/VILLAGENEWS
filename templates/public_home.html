@@ -57,7 +57,7 @@
         {% for n in news_list %}
           <div class="card" data-title="{{ n['title'] }}">
 
-            <!-- ✅ Thumbnail FIX -->
+            <!-- ✅ Thumbnail FIX (fallback if missing/broken) -->
             {% if n["thumb"] %}
               <img src="{{ n['thumb'] }}" class="thumb"
                    onerror="this.onerror=null;this.src='{{ url_for('static', filename='logo.png') }}';">
@@ -74,11 +74,24 @@
             <div class="newsMetaRow">
               <p class="date">🕒 {{ n["created_at"] }} • 👁 {{ n["views"] }}</p>
 
-              <!-- ✅ WhatsApp Share (mobile fix) -->
-              <button class="shareMini"
-                onclick="shareWhatsApp('{{ request.host_url[:-1] }}/news/{{n['id']}}', '{{ n['title']|e }}')">
-                📲 WhatsApp
-              </button>
+              <!-- ✅ Share buttons (ALL + WhatsApp + Copy) -->
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-start;">
+                <button class="shareMini"
+                  onclick="shareLink('/news/{{n['id']}}','{{ n['title']|e }}')">
+                  🔗 Share
+                </button>
+
+                <button class="shareMini"
+                  onclick="shareWhatsApp('/news/{{n['id']}}','{{ n['title']|e }}')">
+                  📲 WhatsApp
+                </button>
+
+                <button class="shareMini"
+                  onclick="copyNews('/news/{{n['id']}}')">
+                  📋 Copy
+                </button>
+              </div>
+
             </div>
           </div>
         {% else %}
@@ -107,9 +120,10 @@
   </section>
 </div>
 
-<!-- ✅ Bottom Section -->
+<!-- ✅ Bottom Section (separate from news) -->
 <section class="bottomSection">
 
+  <!-- ✅ Contact + Editor -->
   <div class="contactBar">
     <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
 
@@ -118,19 +132,32 @@
     </span>
   </div>
 
+  <!-- ✅ Follow Us -->
   <div class="rightFollow">
     <h3 class="rightTitle">Follow Us</h3>
 
     <div class="followRow">
-      <a class="socialBtn fb" href="https://www.facebook.com/share/g/189BVq5vVs/" target="_blank">
+
+      <!-- Facebook -->
+      <a class="socialBtn fb"
+         href="https://www.facebook.com/share/g/189BVq5vVs/"
+         target="_blank">
         Facebook
       </a>
 
-      <a class="socialBtn yt" href="https://youtube.com/@huliyarbabu?si=v4svNXVXiIMZP1zu" target="_blank">
+      <!-- YouTube -->
+      <a class="socialBtn yt"
+         href="https://youtube.com/@huliyarbabu?si=v4svNXVXiIMZP1zu"
+         target="_blank">
         YouTube
       </a>
 
+      <!-- Share site -->
       <button class="socialBtn share" onclick="shareSite()">🔗 Share</button>
+
+      <!-- Copy site -->
+      <button class="socialBtn share" onclick="copySite()">📋 Copy</button>
+
     </div>
   </div>
 
@@ -159,22 +186,64 @@
   }
   searchInput.addEventListener("input", searchFilter);
 
-  // ✅ WhatsApp Share (forces preview)
-  function shareWhatsApp(url, title){
+
+  // ✅ helpers
+  function buildAbsoluteUrl(path){
+    return window.location.origin + path;
+  }
+
+  // ✅ Share (ALL apps)
+  function shareLink(path, title){
+    const url = buildAbsoluteUrl(path);
+    const data = { title: title, text: title, url: url };
+
+    if(navigator.share){
+      navigator.share(data);
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("✅ Link copied!");
+    }
+  }
+
+  // ✅ WhatsApp share (forces thumbnail)
+  function shareWhatsApp(path, title){
+    const url = buildAbsoluteUrl(path);
+
+    // WhatsApp caches previews, so we add unique param
     const finalUrl = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+
     const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + finalUrl);
     window.open(wa, "_blank");
   }
 
-  // ✅ Site Share
+  // ✅ Copy link
+  function copyNews(path){
+    const url = buildAbsoluteUrl(path);
+    navigator.clipboard.writeText(url);
+    alert("✅ Link copied!");
+  }
+
+  // ✅ Share site
   function shareSite(){
     const url = window.location.href;
     const title = "ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ";
-    const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + url);
-    window.open(wa, "_blank");
+    const data = { title: title, text: title, url: url };
+
+    if(navigator.share){
+      navigator.share(data);
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("✅ Link copied!");
+    }
+  }
+
+  // ✅ Copy site
+  function copySite(){
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    alert("✅ Link copied!");
   }
 </script>
 
 </body>
 </html>
-
