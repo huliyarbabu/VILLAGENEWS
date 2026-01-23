@@ -7,9 +7,8 @@
   <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  {# ✅ OG image for WhatsApp preview #}
+  {# ✅ OG thumbnail URL (use news thumb else logo) #}
   {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png', _external=True) %}
-
   {% if thumb_url.startswith("http") %}
     {% set og_img = thumb_url %}
   {% else %}
@@ -24,8 +23,6 @@
   <meta property="og:url" content="{{ request.url }}">
   <meta property="og:image" content="{{ og_img }}">
   <meta property="og:image:secure_url" content="{{ og_img }}">
-
-  <!-- ✅ Big thumbnail support -->
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -67,11 +64,12 @@
     <div class="newsMetaRow">
       <p class="date">🕒 {{ item["created_at"] }} • 👁 {{ item["views"] }}</p>
 
-      <!-- ✅ WhatsApp Share (mobile fix) -->
-      <button class="shareMini"
-        onclick="shareWhatsApp(window.location.href, '{{ item['title']|e }}')">
-        📲 WhatsApp
-      </button>
+      <!-- ✅ Share buttons -->
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="shareMini" onclick="shareAll()">🔗 Share</button>
+        <button class="shareMini" onclick="shareWhatsApp()">📲 WhatsApp</button>
+        <button class="shareMini" onclick="copyLink()">📋 Copy</button>
+      </div>
     </div>
 
     <hr style="margin:12px 0; opacity:0.2;">
@@ -83,7 +81,6 @@
   </div>
 </div>
 
-<!-- ✅ Bottom section -->
 <section class="bottomSection">
   <div class="contactBar">
     <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
@@ -97,12 +94,31 @@
 <footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
 
 <script>
-  // ✅ WhatsApp Share (forces thumbnail preview)
-  function shareWhatsApp(url, title){
-    // force new preview (WhatsApp cache bypass)
-    const finalUrl = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
-    const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + finalUrl);
+  const pageUrl = window.location.href;
+  const pageTitle = "{{ item['title']|e }}";
+
+  // ✅ Share to ALL apps
+  function shareAll(){
+    const data = { title: pageTitle, text: pageTitle, url: pageUrl };
+
+    if(navigator.share){
+      navigator.share(data);
+    } else {
+      copyLink();
+    }
+  }
+
+  // ✅ WhatsApp share (forces preview image)
+  function shareWhatsApp(){
+    const finalUrl = pageUrl + (pageUrl.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const wa = "https://wa.me/?text=" + encodeURIComponent(pageTitle + "\n" + finalUrl);
     window.open(wa, "_blank");
+  }
+
+  // ✅ Copy Link always works
+  function copyLink(){
+    navigator.clipboard.writeText(pageUrl);
+    alert("✅ Link copied!");
   }
 </script>
 
