@@ -7,8 +7,8 @@
   <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  {# ✅ Create absolute thumbnail URL for WhatsApp preview #}
-  {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png') %}
+  {# ✅ OG image for WhatsApp preview #}
+  {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png', _external=True) %}
 
   {% if thumb_url.startswith("http") %}
     {% set og_img = thumb_url %}
@@ -16,7 +16,7 @@
     {% set og_img = url_for('static', filename='logo.png', _external=True) %}
   {% endif %}
 
-  {# ✅ OpenGraph / WhatsApp preview #}
+  <!-- ✅ OpenGraph tags -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
   <meta property="og:title" content="{{ item['title'] }}">
@@ -25,12 +25,11 @@
   <meta property="og:image" content="{{ og_img }}">
   <meta property="og:image:secure_url" content="{{ og_img }}">
 
-  {# ✅ MUST for WhatsApp good preview #}
-  <meta property="og:image:type" content="image/jpeg">
+  <!-- ✅ Big thumbnail support -->
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
-  {# ✅ Twitter preview (optional but helps) #}
+  <!-- ✅ Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ item['title'] }}">
   <meta name="twitter:description" content="{{ item['category'] }} ಸುದ್ದಿ | ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
@@ -41,6 +40,7 @@
 
 <header class="topbar">
   <div class="headerWrap">
+
     <div class="leftLogo">
       <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
     </div>
@@ -54,6 +54,7 @@
       <button class="btn" type="button" onclick="history.back()">⬅ ಹಿಂದಕ್ಕೆ</button>
       <a href="/" class="btn">ಮುಖಪುಟ</a>
     </div>
+
   </div>
 </header>
 
@@ -65,7 +66,12 @@
 
     <div class="newsMetaRow">
       <p class="date">🕒 {{ item["created_at"] }} • 👁 {{ item["views"] }}</p>
-      <button class="shareMini" onclick="shareNews()">🔗 Share</button>
+
+      <!-- ✅ WhatsApp Share (mobile fix) -->
+      <button class="shareMini"
+        onclick="shareWhatsApp(window.location.href, '{{ item['title']|e }}')">
+        📲 WhatsApp
+      </button>
     </div>
 
     <hr style="margin:12px 0; opacity:0.2;">
@@ -91,20 +97,14 @@
 <footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
 
 <script>
-  function shareNews(){
-    const url = window.location.href;
-    const title = "{{ item['title']|e }}";
-    const data = { title: title, text: title, url: url };
-
-    if(navigator.share){
-      navigator.share(data);
-    } else {
-      navigator.clipboard.writeText(url);
-      alert("✅ Link copied!");
-    }
+  // ✅ WhatsApp Share (forces thumbnail preview)
+  function shareWhatsApp(url, title){
+    // force new preview (WhatsApp cache bypass)
+    const finalUrl = url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    const wa = "https://wa.me/?text=" + encodeURIComponent(title + "\n" + finalUrl);
+    window.open(wa, "_blank");
   }
 </script>
 
 </body>
 </html>
-
