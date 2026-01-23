@@ -19,10 +19,10 @@ EDITOR_PASSWORD = "12345"
 # ✅ Allowed types
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif", "mp4", "webm", "ogg", "mov", "3gp", "mkv"}
 
-# ✅ FIXED Cloudinary config (reads from Render Environment Variables correctly)
-cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME")
-api_key = os.environ.get("CLOUDINARY_API_KEY")
-api_secret = os.environ.get("CLOUDINARY_API_SECRET")
+# ✅ Cloudinary config (Render ENV)
+cloud_name = (os.environ.get("CLOUDINARY_CLOUD_NAME") or "").strip()
+api_key = (os.environ.get("CLOUDINARY_API_KEY") or "").strip()
+api_secret = (os.environ.get("CLOUDINARY_API_SECRET") or "").strip()
 
 cloudinary.config(
     cloud_name=cloud_name,
@@ -31,9 +31,14 @@ cloudinary.config(
     secure=True
 )
 
+print("✅ Cloudinary loaded:",
+      "cloud_name =", cloud_name,
+      "api_key =", ("YES" if api_key else "NO"),
+      "api_secret =", ("YES" if api_secret else "NO"))
+
 
 def db():
-    # ✅ Always correct db path (Render fix)
+    # ✅ Always correct db path
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, "news.db")
 
@@ -217,7 +222,6 @@ def editor_edit(news_id):
         content = request.form.get("content", "").strip()
         breaking = 1 if request.form.get("breaking") == "1" else 0
 
-        # ✅ auto thumbnail from first image in content
         thumb = None
         m = re.search(r'<img[^>]+src="([^"]+)"', content)
         if m:
@@ -249,11 +253,14 @@ def editor_delete(news_id):
     return redirect("/editor/dashboard")
 
 
-# ✅ CKEditor upload handler (Cloudinary images + videos)
+# ✅ CKEditor upload handler (Cloudinary images + videos + WhatsApp thumbnail fix)
 @app.route("/upload-media", methods=["POST"])
 def upload_media():
     if not editor_required():
         return jsonify({"uploaded": 0, "error": {"message": "Session expired. Please login again."}}), 401
+
+    if not cloud_name or not api_key or not api_secret:
+        return jsonify({"uploaded": 0, "error": {"message": "Cloudinary ENV missing in Render Environment"}}), 500
 
     file = request.files.get("upload")
     if not file:
@@ -267,20 +274,29 @@ def upload_media():
 
     try:
         filename = secure_filename(file.filename)
-        ext = filename.rsplit(".", 1)[-1].lower()
 
-        is_video = ext in {"mp4", "webm", "ogg", "mov", "3gp", "mkv"}
-
-        # ✅ Upload to Cloudinary
+        # ✅ Upload to Cloudinary (AUTO supports image+video)
         result = cloudinary.uploader.upload(
             file,
-            resource_type="video" if is_video else "image",
+            resource_type="auto",
             folder="huliyar_news"
         )
 
         url = result.get("secure_url")
         if not url:
-            return jsonify({"uploaded": 0, "error": {"message": "Cloudinary upload failed"}}), 500
+            return jsonify({"uploaded": 0, "error": {"message": "Cloudinary upload failed (no secure_url)"}}), 500
+
+        # ✅ WhatsApp Blog Preview thumbnail size (only for image)
+        if result.get("resource_type") == "image":
+            public_id = result.get("public_id")
+            url = cloudinary.CloudinaryImage(public_id).build_url(
+                secure=True,
+                transformation=[
+                    {"width": 1200, "height": 630, "crop": "fill", "gravity": "auto"},
+                    {"quality": "auto"},
+                    {"fetch_format": "auto"}
+                ]
+            )
 
         return jsonify({"uploaded": 1, "fileName": filename, "url": url})
 
