@@ -3,14 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>{{ item["title"] }} - ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  {# ✅ Create absolute thumbnail URL for WhatsApp preview #}
+  {% set thumb_url = item["thumb"] if item["thumb"] else url_for('static', filename='logo.png') %}
+
+  {% if thumb_url.startswith("http") %}
+    {% set og_img = thumb_url %}
+  {% else %}
+    {% set og_img = url_for('static', filename='logo.png', _external=True) %}
+  {% endif %}
+
+  {# ✅ OpenGraph / WhatsApp preview #}
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
+  <meta property="og:title" content="{{ item['title'] }}">
+  <meta property="og:description" content="{{ item['category'] }} ಸುದ್ದಿ | ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:image" content="{{ og_img }}">
+  <meta property="og:image:secure_url" content="{{ og_img }}">
+
+  {# ✅ MUST for WhatsApp good preview #}
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  {# ✅ Twitter preview (optional but helps) #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ item['title'] }}">
+  <meta name="twitter:description" content="{{ item['category'] }} ಸುದ್ದಿ | ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ">
+  <meta name="twitter:image" content="{{ og_img }}">
 </head>
+
 <body>
 
 <header class="topbar">
   <div class="headerWrap">
-
     <div class="leftLogo">
       <img src="{{ url_for('static', filename='logo.png') }}" class="siteLogoBig">
     </div>
@@ -21,20 +51,14 @@
     </div>
 
     <div class="rightActions">
-      <!-- ✅ Back Button -->
       <button class="btn" type="button" onclick="history.back()">⬅ ಹಿಂದಕ್ಕೆ</button>
-
-      <!-- Home -->
       <a href="/" class="btn">ಮುಖಪುಟ</a>
     </div>
-
   </div>
 </header>
 
 <div class="container">
   <div class="card">
-
-    <!-- ✅ Removed thumbnail to avoid duplicate image -->
 
     <span class="tag">{{ item["category"] }}</span>
     <h2 style="margin-top:10px;">{{ item["title"] }}</h2>
@@ -53,9 +77,16 @@
   </div>
 </div>
 
-<div class="contactBar">
-  <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
-</div>
+<!-- ✅ Bottom section -->
+<section class="bottomSection">
+  <div class="contactBar">
+    <a class="contactBtn" href="tel:9448760070">📞 Contact: 9448760070</a>
+
+    <span class="contactBtn editorBtn">
+      ✍ Editor: <b>Narendra Babu Huliyar</b>
+    </span>
+  </div>
+</section>
 
 <footer class="footer">© 2026 ಹುಳಿಯಾರು ಸುದ್ದಿ ಸಮಾಚಾರ</footer>
 
